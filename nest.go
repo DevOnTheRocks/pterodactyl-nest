@@ -7,8 +7,10 @@ import (
 )
 
 func main() {
-	response := api.GetServers()
-	for _, server := range response.Data {
-		fmt.Printf("%+v", server)
+	response := api.GetNodes()
+	fmt.Printf("%+v", response)
+
+	for _, nodes := range response {
+		fmt.Printf("%+v", nodes)
 	}
 }
