@@ -1,4 +1,4 @@
-package main
+package api
 
 // ServersResponse - Pterodactyl API response.
 type ServersResponse struct {

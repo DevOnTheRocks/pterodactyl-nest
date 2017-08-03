@@ -1,4 +1,4 @@
-package main
+package api
 
 // NodesResponse - A nodes Pterodactyl API response.
 type NodesResponse []struct {

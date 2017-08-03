@@ -1,4 +1,4 @@
-package main
+package api
 
 // UsersResponse - Pterodactyl Users API response.
 type UsersResponse struct {
