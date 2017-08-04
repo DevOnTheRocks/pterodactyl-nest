@@ -9,6 +9,11 @@ func getResponse(endpoint string) []byte {
 	return network.Get(endpoint, nil, headers)
 }
 
+func putResponse(endpoint string, body interface{}) []byte {
+	headers := network.GetAuthHeaders(endpoint)
+	return network.Put(endpoint, body, headers)
+}
+
 // GetServers - Return Pterodactyl Servers API response.
 func GetServers() ServersResponse {
 	var servers ServersResponse
@@ -48,7 +53,7 @@ func GetUser(id int) UserResponse {
 // GetNodes - Return Pterodactyl Users API response.
 func GetNodes() NodesResponse {
 	var nodes NodesResponse
-	response := getResponse("nodes")
+	response := getResponse("admin/nodes")
 	json.Unmarshal(response, &nodes)
 
 	return nodes
@@ -57,8 +62,21 @@ func GetNodes() NodesResponse {
 // GetNode - Return Pterodactyl Node API response.
 func GetNode(id int) NodeResponse {
 	var node NodeResponse
-	response := getResponse(fmt.Sprintf("nodes/%d", id))
+	response := getResponse(fmt.Sprintf("admin/nodes/%d", id))
 	json.Unmarshal(response, &node)
 
 	return node
+}
+
+// TogglePower - Return Pterodactyl Power API response.
+func TogglePower(id int, action string) {
+	server := GetServer(id).Data.Attributes
+
+	body := struct {
+		Action string `json:"action"`
+	}{action}
+
+	response := putResponse(fmt.Sprintf("me/server/%s", server.UUIDShort), body)
+
+	fmt.Printf("%+v", response)
 }

@@ -1,16 +1,10 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/cossacksman/nest/api"
-)
+import "github.com/cossacksman/nest/api"
+import "fmt"
 
 func main() {
-	response := api.GetNodes()
-	fmt.Printf("%+v", response)
-
-	for _, nodes := range response {
-		fmt.Printf("%+v", nodes)
-	}
+	// api.TogglePower(1, api.Stop)
+	server := api.GetServer(11)
+	fmt.Printf("%+v", server.Data.Attributes)
 }

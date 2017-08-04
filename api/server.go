@@ -1,5 +1,17 @@
 package api
 
+// Start - Server start
+const Start = "start"
+
+// Stop - Server stop
+const Stop = "stop"
+
+// Restart - Server restart
+const Restart = "restart"
+
+// Kill - Server kill
+const Kill = "kill"
+
 // ServersResponse - Pterodactyl API response.
 type ServersResponse struct {
 	Data []struct {
