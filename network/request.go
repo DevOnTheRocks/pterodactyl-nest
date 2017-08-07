@@ -14,7 +14,7 @@ import (
 
 // Get - A method to perform GET requests.
 func Get(endpoint string) []byte {
-	headers := GetAuthHeaders(endpoint)
+	key, value := GetAuthHeader(endpoint, "")
 	uri := config.GetConfig().Domain + endpoint
 	req, err := http.NewRequest("GET", uri, nil)
 
@@ -23,9 +23,7 @@ func Get(endpoint string) []byte {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	for key, value := range headers {
-		req.Header.Set(key, value)
-	}
+	req.Header.Set(key, value)
 
 	resp, err := http.DefaultClient.Do(req)
 
@@ -45,7 +43,7 @@ func Get(endpoint string) []byte {
 // Post - A method to perform POST requests.
 func Post(endpoint string, body string) []byte {
 	uri := config.GetConfig().Domain + endpoint
-	headers := GetAuthHeaders(endpoint)
+	key, value := GetAuthHeader(endpoint, body)
 	client := &http.Client{}
 
 	req, err := http.NewRequest("POST", uri, strings.NewReader(body))
@@ -55,9 +53,7 @@ func Post(endpoint string, body string) []byte {
 	}
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	for key, value := range headers {
-		req.Header.Set(key, value)
-	}
+	req.Header.Set(key, value)
 
 	resp, err := client.Do(req)
 
@@ -79,26 +75,18 @@ func Put(endpoint string, body string, headers map[string]string) {
 	// TODO:- Stub.
 }
 
-// GetAuthHeaders - Create an auth string from a URI.
-func GetAuthHeaders(endpoint string) map[string]string {
+// GetAuthHeader - Create an auth string from a URI.
+func GetAuthHeader(endpoint string, body string) (string, string) {
 	cfg := config.GetConfig()
 	uri := cfg.Domain + endpoint
 
-	fmt.Printf("\n=============================================================================\n")
-	fmt.Println(endpoint)
-	fmt.Printf("Contacting endpoint: %s \n", uri)
-
 	hash := hmac.New(sha256.New, []byte(cfg.PrivateKey))
-	hash.Write([]byte(uri))
+	hash.Write([]byte(uri + body))
 	based := b64.StdEncoding.EncodeToString(hash.Sum(nil))
 	output := cfg.PublicKey + "." + based
 
-	fmt.Println(output)
-	fmt.Printf("=============================================================================\n")
+	key := "Authorization"
+	value := fmt.Sprintf("Bearer %s", output)
 
-	headers := map[string]string{
-		"Authorization": fmt.Sprintf("Bearer %s", output),
-	}
-
-	return headers
+	return key, value
 }

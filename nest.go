@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	response := api.TogglePower(1, api.Stop)
+	response := api.TogglePower(1, api.Restart)
 	// server := api.GetServer(1)
 	fmt.Printf("\n%+v", response)
 }
