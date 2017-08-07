@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	b64 "encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +13,8 @@ import (
 )
 
 // Get - A method to perform GET requests.
-func Get(endpoint string, args []string, headers map[string]string) []byte {
+func Get(endpoint string) []byte {
+	headers := GetAuthHeaders(endpoint)
 	uri := config.GetConfig().Domain + endpoint
 	req, err := http.NewRequest("GET", uri, nil)
 
@@ -43,29 +43,18 @@ func Get(endpoint string, args []string, headers map[string]string) []byte {
 }
 
 // Post - A method to perform POST requests.
-func Post() {
-	// uri := config.GetConfig().Domain + endpoint
-	// req, err := http.NewRequest("GET", uri, nil)
-
-}
-
-// Put - A method to perform PUT requests.
-func Put(endpoint string, body interface{}, headers map[string]string) []byte {
+func Post(endpoint string, body string) []byte {
 	uri := config.GetConfig().Domain + endpoint
-	data, err := json.Marshal(body)
+	headers := GetAuthHeaders(endpoint)
 	client := &http.Client{}
 
-	if err != nil {
-		panic(err)
-	}
-
-	req, err := http.NewRequest("PUT", uri, strings.NewReader(string(data)))
+	req, err := http.NewRequest("POST", uri, strings.NewReader(body))
 
 	if err != nil {
 		panic(err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
@@ -85,18 +74,27 @@ func Put(endpoint string, body interface{}, headers map[string]string) []byte {
 	}
 }
 
+// Put - A method to perform PUT requests.
+func Put(endpoint string, body string, headers map[string]string) {
+	// TODO:- Stub.
+}
+
 // GetAuthHeaders - Create an auth string from a URI.
 func GetAuthHeaders(endpoint string) map[string]string {
 	cfg := config.GetConfig()
-	configuration := config.GetConfig()
-	uri := configuration.Domain + endpoint
+	uri := cfg.Domain + endpoint
 
+	fmt.Printf("\n=============================================================================\n")
+	fmt.Println(endpoint)
 	fmt.Printf("Contacting endpoint: %s \n", uri)
 
 	hash := hmac.New(sha256.New, []byte(cfg.PrivateKey))
 	hash.Write([]byte(uri))
 	based := b64.StdEncoding.EncodeToString(hash.Sum(nil))
 	output := cfg.PublicKey + "." + based
+
+	fmt.Println(output)
+	fmt.Printf("=============================================================================\n")
 
 	headers := map[string]string{
 		"Authorization": fmt.Sprintf("Bearer %s", output),
